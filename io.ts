@@ -42,6 +42,22 @@ export interface PeristenceReporter {
   ): void;
 }
 
+export function consolePersistenceResultReporter(
+  ctx: Context,
+  ph: PersistenceHandler,
+  result: PersistenceResult | string,
+): void {
+  console.log(
+    typeof result === "string"
+      ? result
+      : `${result.finalArtifactNamePhysicalRel} (${
+        result.artifacts.length > 1
+          ? "append"
+          : (result.overwroteExisting.length > 0 ? "overwrote" : "new")
+      })`,
+  );
+}
+
 export enum PeristenceErrorCode {
   DestinationPathNotFound = 100,
 }

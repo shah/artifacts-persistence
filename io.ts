@@ -77,11 +77,27 @@ export interface TextWriter {
   (ctx: Context, writer: Writer, te?: TextEncoder): void;
 }
 
-export interface PersistTextArtifactOptions {
+export interface PersistArtifactOptions {
   readonly appendIfExists?: boolean;
   readonly logicalNamingStrategy?: ArtifactNamingStrategy;
   readonly physicalNamingStrategy?: ArtifactNamingStrategy;
   readonly chmod?: number;
+}
+
+export interface PersistenceDestAs {
+  readonly persistOptions?: PersistArtifactOptions;
+  readonly persistAsName: TextValue;
+}
+
+export interface PersistenceDestinationSupplier {
+  readonly isPersistenceDestinationSupplier: true;
+  readonly persistDestAs: PersistenceDestAs;
+}
+
+export function isPersistenceDestinationSupplier(
+  o: object,
+): o is PersistenceDestinationSupplier {
+  return "isPersistenceDestinationSupplier" in o;
 }
 
 export interface PersistenceHandler {
@@ -96,7 +112,7 @@ export interface PersistenceHandler {
     ctx: Context,
     artifactName: TextValue,
     artifact: TextArtifact,
-    options?: PersistTextArtifactOptions,
+    options?: PersistArtifactOptions,
   ): PersistenceResult | undefined;
   handleError(
     ctx: Context,
@@ -142,7 +158,7 @@ export class FileSystemPersistenceHandler implements PersistenceHandler {
     finalPhysicalAbs: string,
     artifactName: TextValue,
     artifact: TextArtifact,
-    ptaOptions?: PersistTextArtifactOptions,
+    ptaOptions?: PersistArtifactOptions,
   ): void {
     if (ptaOptions && ptaOptions.chmod != undefined) {
       try {
@@ -173,7 +189,7 @@ export class FileSystemPersistenceHandler implements PersistenceHandler {
     ctx: Context,
     artifactName: TextValue,
     artifact: TextArtifact,
-    ptaOptions?: PersistTextArtifactOptions,
+    ptaOptions?: PersistArtifactOptions,
   ): PersistenceResult | undefined {
     const namingParams = {
       artifact: artifact,
@@ -321,7 +337,7 @@ export class InMemoryPersistenceHandler implements PersistenceHandler {
     ctx: Context,
     artifactName: TextValue,
     artifact: TextArtifact,
-    options?: PersistTextArtifactOptions,
+    options?: PersistArtifactOptions,
   ): PersistenceResult {
     const finalLogical = this.logicalNamingStrategy(ctx, {
       artifact: artifact,
@@ -382,7 +398,7 @@ export class ConsolePersistenceHandler implements PersistenceHandler {
     ctx: Context,
     artifactName: TextValue,
     artifact: TextArtifact,
-    options?: PersistTextArtifactOptions,
+    options?: PersistArtifactOptions,
   ): PersistenceResult {
     console.log(artifact.text(ctx));
     const finalLogical = resolveTextValue(ctx, artifactName);

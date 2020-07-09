@@ -14,11 +14,11 @@ import {
   ArtifactNamingStrategy,
   asIsNamingStrategy,
 } from "./naming.ts";
-import { Context } from "https://cdn.jsdelivr.net/gh/shah/context-manager/mod.ts";
+import { Context } from "https://cdn.jsdelivr.net/gh/shah/context-manager@v1.0.1/mod.ts";
 import {
   resolveTextValue,
   TextValue,
-} from "https://cdn.jsdelivr.net/gh/shah/value-manager/mod.ts";
+} from "https://cdn.jsdelivr.net/gh/shah/value-manager@v1.0.1/mod.ts";
 
 export type Reader = Deno.Reader;
 export type Writer = Deno.Writer;

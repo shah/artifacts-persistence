@@ -1,9 +1,9 @@
 import * as path from "https://deno.land/std@v0.60.0/path/mod.ts";
-import { Context } from "https://cdn.jsdelivr.net/gh/shah/context-manager/mod.ts";
+import { Context } from "https://cdn.jsdelivr.net/gh/shah/context-manager@v1.0.1/mod.ts";
 import {
   resolveTextValue,
   TextValue,
-} from "https://cdn.jsdelivr.net/gh/shah/value-manager/mod.ts";
+} from "https://cdn.jsdelivr.net/gh/shah/value-manager@v1.0.1/mod.ts";
 import { Artifact, isTextArtifact } from "./artifact.ts";
 
 export interface ArtifactNamingParams {

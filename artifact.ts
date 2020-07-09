@@ -1,10 +1,10 @@
 import { StringWriter } from "https://deno.land/std@v0.60.0/io/mod.ts";
-import { Context } from "https://cdn.jsdelivr.net/gh/shah/context-manager/mod.ts";
+import { Context } from "https://cdn.jsdelivr.net/gh/shah/context-manager@v1.0.1/mod.ts";
 import { TextWriter, Writer } from "./io.ts";
 import {
   resolveTextValue,
   TextValue,
-} from "https://cdn.jsdelivr.net/gh/shah/value-manager/mod.ts";
+} from "https://cdn.jsdelivr.net/gh/shah/value-manager@v1.0.1/mod.ts";
 import { TextArtifactNature } from "./nature.ts";
 
 export interface Artifact {

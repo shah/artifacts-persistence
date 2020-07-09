@@ -1,4 +1,4 @@
-import { TextValue } from "https://cdn.jsdelivr.net/gh/shah/value-manager/mod.ts";
+import { TextValue } from "https://cdn.jsdelivr.net/gh/shah/value-manager@v1.0.1/mod.ts";
 
 export interface TextArtifactNature {
   readonly isTextArtifactNature: true;

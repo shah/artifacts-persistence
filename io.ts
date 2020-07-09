@@ -79,6 +79,7 @@ export interface TextWriter {
 
 export interface PersistArtifactOptions {
   readonly appendIfExists?: boolean;
+  readonly appendDelim?: string;
   readonly logicalNamingStrategy?: ArtifactNamingStrategy;
   readonly physicalNamingStrategy?: ArtifactNamingStrategy;
   readonly chmod?: number;
@@ -249,7 +250,10 @@ export class FileSystemPersistenceHandler implements PersistenceHandler {
         text = artifact.textFragment(ctx);
         writeFileStrSync(
           activePR.finalArtifactNamePhysicalAbs,
-          existingContent + text,
+          existingContent + (ptaOptions.appendDelim
+            ? ptaOptions.appendDelim
+            : "") +
+            text,
         );
         this.chmod(
           ctx,

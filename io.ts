@@ -1,9 +1,9 @@
-import * as fs from "https://deno.land/std@v0.60.0/fs/mod.ts";
+import * as fs from "https://deno.land/std@v0.61.0/fs/mod.ts";
 import {
   readFileStrSync,
   writeFileStrSync,
-} from "https://deno.land/std@v0.60.0/fs/mod.ts";
-import * as path from "https://deno.land/std@v0.60.0/path/mod.ts";
+} from "https://deno.land/std@v0.61.0/fs/mod.ts";
+import * as path from "https://deno.land/std@v0.61.0/path/mod.ts";
 import {
   DefaultTextArtifact,
   MutableTextArtifact,

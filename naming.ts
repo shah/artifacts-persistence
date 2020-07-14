@@ -1,4 +1,4 @@
-import * as path from "https://deno.land/std@v0.60.0/path/mod.ts";
+import * as path from "https://deno.land/std@v0.61.0/path/mod.ts";
 import { Context } from "https://cdn.jsdelivr.net/gh/shah/context-manager@v1.0.1/mod.ts";
 import {
   resolveTextValue,

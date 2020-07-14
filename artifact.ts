@@ -1,4 +1,4 @@
-import { StringWriter } from "https://deno.land/std@v0.60.0/io/mod.ts";
+import { StringWriter } from "https://deno.land/std@v0.61.0/io/mod.ts";
 import { Context } from "https://cdn.jsdelivr.net/gh/shah/context-manager@v1.0.1/mod.ts";
 import { TextWriter, Writer } from "./io.ts";
 import {

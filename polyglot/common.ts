@@ -56,15 +56,6 @@ export const dockerfileArtifact = new (class implements TextArtifactNature {
   constructor() {}
 })();
 
-export const jsonArtifact = new (class implements TextArtifactNature {
-  readonly isTextArtifactNature = true;
-  readonly name = "JSON";
-  readonly defaultFileExtn: string = ".json";
-  readonly fileExtensions: string[] = [this.defaultFileExtn];
-
-  constructor() {}
-})();
-
 export const shfileArtifact = new (class implements TextArtifactNature {
   readonly isTextArtifactNature = true;
   readonly name = "SH";

@@ -1,4 +1,4 @@
-import { MutableTextArtifact } from "../artifact.ts";
+import { MutableTextArtifact, DefaultTextArtifact } from "../artifact.ts";
 import { contextMgr as cm, inflect, valueMgr as vm } from "../deps.ts";
 import { PersistenceHandler } from "../io.ts";
 import { TextArtifactNature } from "../nature.ts";
@@ -15,21 +15,25 @@ export const typeScriptArtifact = new (class implements TextArtifactNature {
   constructor() {}
 })();
 
-export class TypeScriptCodeDeclaration implements code.PolyglotCodeDecl {
-  readonly modules: TypeScriptModuleDeclaration[] = [];
+export class TypeScriptArtifact extends DefaultTextArtifact {
+  constructor() {
+    super({ nature: typeScriptArtifact });
+  }
+}
+
+export class TypeScriptArtifacts implements code.PolyglotCodeArtifacts {
+  readonly modules: TypeScriptModule[] = [];
 
   constructor(readonly ph: PersistenceHandler) {
   }
 
-  declareModule(module: TypeScriptModuleDeclaration): void {
+  declareModule(module: TypeScriptModule): void {
     this.modules.push(module);
   }
 
   emit(ctx: cm.Context, eh: code.PolyglotErrorHandler): void {
     for (const module of this.modules) {
-      const mta = this.ph.createMutableTextArtifact(ctx, {
-        nature: typeScriptArtifact,
-      });
+      const mta = new TypeScriptArtifact();
       module.emit(ctx, mta, eh);
       this.ph.persistTextArtifact(
         ctx,
@@ -40,16 +44,16 @@ export class TypeScriptCodeDeclaration implements code.PolyglotCodeDecl {
   }
 }
 
-export class TypeScriptModuleDeclaration implements code.PolyglotModuleDecl {
-  readonly interfaces: TypeScriptInterfaceDeclaration[] = [];
+export class TypeScriptModule implements code.PolyglotModuleDecl {
+  readonly interfaces: TypeScriptInterface[] = [];
 
   constructor(
-    readonly code: TypeScriptCodeDeclaration,
+    readonly code: TypeScriptArtifacts,
     readonly name: inflect.InflectableValue,
   ) {
   }
 
-  declareInterface(intf: TypeScriptInterfaceDeclaration): void {
+  declareInterface(intf: TypeScriptInterface): void {
     this.interfaces.push(intf);
   }
 
@@ -64,13 +68,12 @@ export class TypeScriptModuleDeclaration implements code.PolyglotModuleDecl {
   }
 }
 
-export class TypeScriptInterfaceDeclaration
-  implements code.PolyglotInterfaceDecl {
+export class TypeScriptInterface implements code.PolyglotInterfaceDecl {
   readonly properties: code.PolyglotPropertyDecl[] = [];
   readonly content: object[] = [];
 
   constructor(
-    readonly module: TypeScriptModuleDeclaration,
+    readonly module: TypeScriptModule,
     readonly name: inflect.InflectableValue,
   ) {
   }
@@ -97,7 +100,7 @@ export class TypeScriptInterfaceDeclaration
     }
     const intfIdentifier = inflect.toPascalCase(this.name);
     mta.appendText(ctx, `export interface ${intfIdentifier} {\n`);
-    mta.appendText(ctx, "  " + propDecls.join(",\n  "));
+    mta.appendText(ctx, "  " + propDecls.join("\n  "));
     mta.appendText(ctx, "\n}\n\n");
 
     const contentConstIdentifier = inflect.toCamelCase(this.name) + "Content";
@@ -119,5 +122,40 @@ export class TypeScriptInterfaceDeclaration
       );
     }
     mta.appendText(ctx, "];");
+  }
+}
+
+export class TypicalTypeScriptProperty implements code.PolyglotPropertyDecl {
+  constructor(
+    readonly name: inflect.InflectableValue,
+    readonly tsType: vm.TextValue,
+  ) {
+  }
+
+  getInterfaceDecl(
+    ctx: cm.Context,
+    eh: code.PolyglotErrorHandler,
+  ): string | undefined {
+    return `readonly ${inflect.toCamelCase(this.name)}: ${this.tsType};`;
+  }
+
+  getContentDecl(
+    ctx: cm.Context,
+    content: object,
+    eh: code.PolyglotErrorHandler,
+  ): string | undefined {
+    const value = (content as any)[this.name.inflect()];
+    const identifier = inflect.toCamelCase(this.name);
+    switch (typeof value) {
+      case "string":
+        return `${identifier}: "${value}"`;
+      case "object":
+        if (value instanceof Date) {
+          return `${identifier}: new Date("${value.getFullYear()}-${value
+            .getMonth() + 1}-${value.getDate() + 1}")`;
+        }
+      default:
+        return `${identifier}: ${value}`;
+    }
   }
 }

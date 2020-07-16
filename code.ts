@@ -5,26 +5,26 @@ export type PolyglotIdentifier = string;
 
 export interface PolyglotErrorHandler {
   reportError(
-    code: PolyglotCodeDecl,
+    code: PolyglotCodeArtifacts,
     message: PolyglotErrorMessage,
   ): void;
 }
 
 export const consolePolyglotErrorHandler = {
   reportError(
-    code: PolyglotCodeDecl,
+    code: PolyglotCodeArtifacts,
     message: PolyglotErrorMessage,
   ): void {
     console.error(message);
   },
 };
 
-export interface PolyglotCodeDeclOptions {
-  emit(ctx: cm.Context, eh: PolyglotErrorHandler): void;
+export interface PolyglotCodeArtifactsOptions {
 }
 
-export interface PolyglotCodeDecl extends PolyglotCodeDeclOptions {
+export interface PolyglotCodeArtifacts extends PolyglotCodeArtifactsOptions {
   declareModule(module: PolyglotModuleDecl): void;
+  emit(ctx: cm.Context, eh: PolyglotErrorHandler): void;
 }
 
 export interface PolyglotModuleDeclOptions {

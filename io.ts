@@ -1,9 +1,3 @@
-import * as fs from "https://deno.land/std@v0.61.0/fs/mod.ts";
-import {
-  readFileStrSync,
-  writeFileStrSync,
-} from "https://deno.land/std@v0.61.0/fs/mod.ts";
-import * as path from "https://deno.land/std@v0.61.0/path/mod.ts";
 import {
   DefaultTextArtifact,
   MutableTextArtifact,
@@ -11,20 +5,21 @@ import {
   TextArtifact,
 } from "./artifact.ts";
 import {
+  contextMgr as cm,
+  stdFS as fs,
+  stdPath as path,
+  valueMgr as vm,
+} from "./deps.ts";
+import {
   ArtifactNamingStrategy,
   asIsNamingStrategy,
 } from "./naming.ts";
-import { Context } from "https://cdn.jsdelivr.net/gh/shah/context-manager@v1.0.1/mod.ts";
-import {
-  resolveTextValue,
-  TextValue,
-} from "https://cdn.jsdelivr.net/gh/shah/value-manager@v1.0.1/mod.ts";
 
 export type Reader = Deno.Reader;
 export type Writer = Deno.Writer;
 
 export interface PersistenceResult {
-  readonly origArtifactName: TextValue;
+  readonly origArtifactName: vm.TextValue;
   readonly finalArtifactNameLogical: string;
   readonly finalArtifactNamePhysical: string;
   readonly finalArtifactNamePhysicalAbs: string;
@@ -36,14 +31,14 @@ export interface PersistenceResult {
 
 export interface PeristenceReporter {
   (
-    ctx: Context,
+    ctx: cm.Context,
     ph: PersistenceHandler,
     result: PersistenceResult | string,
   ): void;
 }
 
 export function consolePersistenceResultReporter(
-  ctx: Context,
+  ctx: cm.Context,
   ph: PersistenceHandler,
   result: PersistenceResult | string,
 ): void {
@@ -64,9 +59,9 @@ export enum PeristenceErrorCode {
 
 export interface PeristenceErrorHandler {
   (
-    ctx: Context,
+    ctx: cm.Context,
     ph: PersistenceHandler,
-    artifactName: TextValue,
+    artifactName: vm.TextValue,
     artifact: TextArtifact,
     code: number,
     message: string,
@@ -74,7 +69,7 @@ export interface PeristenceErrorHandler {
 }
 
 export interface TextWriter {
-  (ctx: Context, writer: Writer, te?: TextEncoder): void;
+  (ctx: cm.Context, writer: Writer, te?: TextEncoder): void;
 }
 
 export interface PersistArtifactOptions {
@@ -87,7 +82,7 @@ export interface PersistArtifactOptions {
 
 export interface PersistenceDestAs {
   readonly persistOptions?: PersistArtifactOptions;
-  readonly persistAsName: TextValue;
+  readonly persistAsName: vm.TextValue;
 }
 
 export interface PersistenceDestinationSupplier {
@@ -106,18 +101,18 @@ export interface PersistenceHandler {
   readonly resultsMap: Map<string, PersistenceResult>;
 
   createMutableTextArtifact(
-    ctx: Context,
+    ctx: cm.Context,
     options: MutableTextArtifactOptions,
   ): MutableTextArtifact;
   persistTextArtifact(
-    ctx: Context,
-    artifactName: TextValue,
+    ctx: cm.Context,
+    artifactName: vm.TextValue,
     artifact: TextArtifact,
     options?: PersistArtifactOptions,
   ): PersistenceResult | undefined;
   handleError(
-    ctx: Context,
-    artifactName: TextValue,
+    ctx: cm.Context,
+    artifactName: vm.TextValue,
     artifact: TextArtifact,
     code: number,
     message: string,
@@ -155,9 +150,9 @@ export class FileSystemPersistenceHandler implements PersistenceHandler {
   }
 
   protected chmod(
-    ctx: Context,
+    ctx: cm.Context,
     finalPhysicalAbs: string,
-    artifactName: TextValue,
+    artifactName: vm.TextValue,
     artifact: TextArtifact,
     ptaOptions?: PersistArtifactOptions,
   ): void {
@@ -180,15 +175,15 @@ export class FileSystemPersistenceHandler implements PersistenceHandler {
   }
 
   createMutableTextArtifact(
-    ctx: Context,
+    ctx: cm.Context,
     options: MutableTextArtifactOptions,
   ): MutableTextArtifact {
     return new DefaultTextArtifact(options);
   }
 
   public persistTextArtifact(
-    ctx: Context,
-    artifactName: TextValue,
+    ctx: cm.Context,
+    artifactName: vm.TextValue,
     artifact: TextArtifact,
     ptaOptions?: PersistArtifactOptions,
   ): PersistenceResult | undefined {
@@ -244,11 +239,11 @@ export class FileSystemPersistenceHandler implements PersistenceHandler {
     let activePR = this.resultsMap.get(resultsMapKey);
     if (activePR && (ptaOptions && ptaOptions.appendIfExists)) {
       if (!this.fspOptions.dryRun) {
-        const existingContent = readFileStrSync(
+        const existingContent = fs.readFileStrSync(
           activePR.finalArtifactNamePhysicalAbs,
         );
         text = artifact.textFragment(ctx);
-        writeFileStrSync(
+        fs.writeFileStrSync(
           activePR.finalArtifactNamePhysicalAbs,
           existingContent + (ptaOptions.appendDelim
             ? ptaOptions.appendDelim
@@ -267,7 +262,7 @@ export class FileSystemPersistenceHandler implements PersistenceHandler {
     } else {
       const overwroteExisting = activePR ? true : false;
       if (!this.fspOptions.dryRun) {
-        writeFileStrSync(finalPhysicalAbs, text);
+        fs.writeFileStrSync(finalPhysicalAbs, text);
         this.chmod(
           ctx,
           finalPhysicalAbs,
@@ -301,8 +296,8 @@ export class FileSystemPersistenceHandler implements PersistenceHandler {
   }
 
   handleError(
-    ctx: Context,
-    artifactName: TextValue,
+    ctx: cm.Context,
+    artifactName: vm.TextValue,
     artifact: TextArtifact,
     code: number,
     message: string,
@@ -331,15 +326,15 @@ export class InMemoryPersistenceHandler implements PersistenceHandler {
   ) {}
 
   createMutableTextArtifact(
-    ctx: Context,
+    ctx: cm.Context,
     options: MutableTextArtifactOptions,
   ): MutableTextArtifact {
     return new DefaultTextArtifact(options);
   }
 
   public persistTextArtifact(
-    ctx: Context,
-    artifactName: TextValue,
+    ctx: cm.Context,
+    artifactName: vm.TextValue,
     artifact: TextArtifact,
     options?: PersistArtifactOptions,
   ): PersistenceResult {
@@ -375,8 +370,8 @@ export class InMemoryPersistenceHandler implements PersistenceHandler {
   }
 
   handleError(
-    ctx: Context,
-    artifactName: TextValue,
+    ctx: cm.Context,
+    artifactName: vm.TextValue,
     artifact: TextArtifact,
     code: number,
     message: string,
@@ -392,20 +387,20 @@ export class ConsolePersistenceHandler implements PersistenceHandler {
   constructor() {}
 
   createMutableTextArtifact(
-    ctx: Context,
+    ctx: cm.Context,
     options: MutableTextArtifactOptions,
   ): MutableTextArtifact {
     return new DefaultTextArtifact(options);
   }
 
   public persistTextArtifact(
-    ctx: Context,
-    artifactName: TextValue,
+    ctx: cm.Context,
+    artifactName: vm.TextValue,
     artifact: TextArtifact,
     options?: PersistArtifactOptions,
   ): PersistenceResult {
     console.log(artifact.text(ctx));
-    const finalLogical = resolveTextValue(ctx, artifactName);
+    const finalLogical = vm.resolveTextValue(ctx, artifactName);
     const exists = this.resultsMap.get(finalLogical);
     if (!exists) {
       const pr = {
@@ -433,8 +428,8 @@ export class ConsolePersistenceHandler implements PersistenceHandler {
   }
 
   handleError(
-    ctx: Context,
-    artifactName: TextValue,
+    ctx: cm.Context,
+    artifactName: vm.TextValue,
     artifact: TextArtifact,
     code: number,
     message: string,

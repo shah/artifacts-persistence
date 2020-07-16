@@ -1,39 +1,34 @@
-import * as path from "https://deno.land/std@v0.61.0/path/mod.ts";
-import { Context } from "https://cdn.jsdelivr.net/gh/shah/context-manager@v1.0.1/mod.ts";
-import {
-  resolveTextValue,
-  TextValue,
-} from "https://cdn.jsdelivr.net/gh/shah/value-manager@v1.0.1/mod.ts";
 import { Artifact, isTextArtifact } from "./artifact.ts";
+import { contextMgr as cm, stdPath as path, valueMgr as vm } from "./deps.ts";
 
 export interface ArtifactNamingParams {
   readonly artifact: Artifact;
-  readonly suggestedName: TextValue;
+  readonly suggestedName: vm.TextValue;
   readonly fileIndex: number;
 }
 
 export interface ArtifactNamingStrategy {
-  (ctx: Context, params: ArtifactNamingParams): string;
+  (ctx: cm.Context, params: ArtifactNamingParams): string;
 }
 
 export function asIsNamingStrategy(
-  ctx: Context,
+  ctx: cm.Context,
   params: ArtifactNamingParams,
 ): string {
-  return resolveTextValue(ctx, params.suggestedName);
+  return vm.resolveTextValue(ctx, params.suggestedName);
 }
 
 export function defaultExtensionNamingStrategy(
-  extn: TextValue,
+  extn: vm.TextValue,
 ): ArtifactNamingStrategy {
   return (
-    ctx: Context,
+    ctx: cm.Context,
     params: ArtifactNamingParams,
   ): string => {
-    const suggestNameResolved = resolveTextValue(ctx, params.suggestedName);
+    const suggestNameResolved = vm.resolveTextValue(ctx, params.suggestedName);
     const hasExtension = path.extname(suggestNameResolved) != "";
     if (!hasExtension) {
-      return suggestNameResolved + resolveTextValue(ctx, extn);
+      return suggestNameResolved + vm.resolveTextValue(ctx, extn);
     }
     return suggestNameResolved;
   };
@@ -43,7 +38,7 @@ export function natureNamingStrategy(
   otherwise?: ArtifactNamingStrategy,
 ): ArtifactNamingStrategy {
   return (
-    ctx: Context,
+    ctx: cm.Context,
     params: ArtifactNamingParams,
   ): string => {
     if (!isTextArtifact(params.artifact)) {
@@ -52,30 +47,30 @@ export function natureNamingStrategy(
         : asIsNamingStrategy(ctx, params);
     }
 
-    const suggestNameResolved = resolveTextValue(ctx, params.suggestedName);
+    const suggestNameResolved = vm.resolveTextValue(ctx, params.suggestedName);
     const hasExtension = path.extname(suggestNameResolved) != "";
     if (!hasExtension) {
       return suggestNameResolved +
-        resolveTextValue(ctx, params.artifact.nature.defaultFileExtn);
+        vm.resolveTextValue(ctx, params.artifact.nature.defaultFileExtn);
     }
     return suggestNameResolved;
   };
 }
 
 export interface SequenceNumberSupplier {
-  (ctx: Context, params: ArtifactNamingParams): number;
+  (ctx: cm.Context, params: ArtifactNamingParams): number;
 }
 
 export interface SequenceNumberFormatter {
   (
-    ctx: Context,
+    ctx: cm.Context,
     params: ArtifactNamingParams,
     sns: SequenceNumberSupplier,
   ): string;
 }
 
 export function asIsSequenceNumberSupplier(
-  ctx: Context,
+  ctx: cm.Context,
   params: ArtifactNamingParams,
 ): number {
   return params.fileIndex;
@@ -85,7 +80,7 @@ export function startAtSequenceNumberSupplier(
   startIndex: number,
 ): SequenceNumberSupplier {
   return (
-    ctx: Context,
+    ctx: cm.Context,
     params: ArtifactNamingParams,
   ): number => {
     return startIndex + params.fileIndex;
@@ -93,7 +88,7 @@ export function startAtSequenceNumberSupplier(
 }
 
 export function threeDigitSeqNumFormatter(
-  ctx: Context,
+  ctx: cm.Context,
   params: ArtifactNamingParams,
   sns: SequenceNumberSupplier,
 ): string {
@@ -107,7 +102,7 @@ export function sequencePrefixNamingStrategy(
   snf: SequenceNumberFormatter = threeDigitSeqNumFormatter,
 ): ArtifactNamingStrategy {
   return (
-    ctx: Context,
+    ctx: cm.Context,
     params: ArtifactNamingParams,
   ): string => {
     const suggested = wrap(ctx, params);
@@ -128,7 +123,7 @@ export function appendExtnNamingStrategy(
 ): ArtifactNamingStrategy {
   if (fileNameIsJustAnExtension(destFile)) {
     return (
-      ctx: Context,
+      ctx: cm.Context,
       params: ArtifactNamingParams,
     ): string => {
       return path.basename(sourceFile) + destFile;

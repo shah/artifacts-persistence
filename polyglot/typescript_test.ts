@@ -3,7 +3,7 @@ import { inflect, stdAsserts as a } from "../deps.ts";
 import * as io from "../io.ts";
 import * as ts from "./typescript.ts";
 
-Deno.test("Transform CSV to TypeScript", async () => {
+Deno.test("TypeScript Polyglot Persistence", async () => {
   const ph = new io.InMemoryPersistenceHandler();
   const code = new ts.TypeScriptArtifacts(ph);
   const module = new ts.TypeScriptModule(code, inflect.guessCaseValue("test"));
@@ -52,7 +52,7 @@ Deno.test("Transform CSV to TypeScript", async () => {
       environmentsName: inflect.guessCaseValue("*_test.ts"),
     },
   }, c.consolePolyglotErrorHandler);
-  a.assertEquals(ph.results.length, 1, "Expected a single results");
+  a.assertEquals(ph.results.length, 1, "Expected a single result");
 
   const golden = io.readFileAsTextFromPaths(
     "typescript_test-simple.ts.golden",

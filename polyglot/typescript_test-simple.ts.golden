@@ -9,9 +9,9 @@ export interface TestInterface {
 
 export const testInterfaceContent: TestInterface[] = [
   {
-    firstName: "Shahid",
-    lastName: "Shah",
+    firstName: 'Shahid',
+    lastName: 'Shah',
     numericProperty: 100,
-    birthDate: new Date("1970-10-10")
+    birthDate: new Date(24364800000)
   },
 ];

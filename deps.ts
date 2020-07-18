@@ -6,3 +6,4 @@ export * as stdFS from "https://deno.land/std@v0.61.0/fs/mod.ts";
 export * as stdIO from "https://deno.land/std@v0.61.0/io/mod.ts";
 export * as stdPath from "https://deno.land/std@v0.61.0/path/mod.ts";
 export * as stdAsserts from "https://deno.land/std@v0.61.0/testing/asserts.ts";
+export * as serializeJS from "https://cdn.jsdelivr.net/gh/shah/javascript-stringify@2.0.2/src/index.ts";

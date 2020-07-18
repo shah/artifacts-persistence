@@ -1,5 +1,10 @@
 import { MutableTextArtifact, DefaultTextArtifact } from "../artifact.ts";
-import { contextMgr as cm, inflect, valueMgr as vm } from "../deps.ts";
+import {
+  contextMgr as cm,
+  inflect,
+  valueMgr as vm,
+  serializeJS,
+} from "../deps.ts";
 import { PersistenceHandler } from "../io.ts";
 import { TextArtifactNature } from "../nature.ts";
 import * as code from "../code.ts";
@@ -146,16 +151,6 @@ export class TypicalTypeScriptProperty implements code.PolyglotPropertyDecl {
   ): string | undefined {
     const value = (content as any)[this.name.inflect()];
     const identifier = inflect.toCamelCase(this.name);
-    switch (typeof value) {
-      case "string":
-        return `${identifier}: "${value}"`;
-      case "object":
-        if (value instanceof Date) {
-          return `${identifier}: new Date("${value.getFullYear()}-${value
-            .getMonth() + 1}-${value.getDate() + 1}")`;
-        }
-      default:
-        return `${identifier}: ${value}`;
-    }
+    return `${identifier}: ${serializeJS.stringify(value)}`;
   }
 }

@@ -111,22 +111,24 @@ export class TypeScriptInterface implements code.PolyglotInterfaceDecl {
     const contentConstIdentifier = inflect.toCamelCase(this.name) + "Content";
     mta.appendText(
       ctx,
-      `export const ${contentConstIdentifier}: ${intfIdentifier}[] = [\n`,
+      `export const ${contentConstIdentifier}: ${intfIdentifier}[] = ${
+        serializeJS.stringify(this.content)
+      };`,
     );
-    for (const content of this.content) {
-      const contentDecls: string[] = [];
-      for (const property of this.properties) {
-        const decl = property.getContentDecl(ctx, content, eh);
-        if (decl) {
-          contentDecls.push(decl);
-        }
-      }
-      mta.appendText(
-        ctx,
-        "  {\n    " + contentDecls.join(",\n    ") + "\n  },\n",
-      );
-    }
-    mta.appendText(ctx, "];");
+    // for (const content of this.content) {
+    //   const contentDecls: string[] = [];
+    //   for (const property of this.properties) {
+    //     const decl = property.getContentDecl(ctx, content, eh);
+    //     if (decl) {
+    //       contentDecls.push(decl);
+    //     }
+    //   }
+    //   mta.appendText(
+    //     ctx,
+    //     "  {\n    " + contentDecls.join(",\n    ") + "\n  },\n",
+    //   );
+    // }
+    // mta.appendText(ctx, "];");
   }
 }
 

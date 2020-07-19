@@ -7,11 +7,4 @@ export interface TestInterface {
   readonly birthDate: Date;
 }
 
-export const testInterfaceContent: TestInterface[] = [
-  {
-    firstName: 'Shahid',
-    lastName: 'Shah',
-    numericProperty: 100,
-    birthDate: new Date(24364800000)
-  },
-];
+export const testInterfaceContent: TestInterface[] = [{'First Name':'Shahid','Last Name':'Shah','Numeric Property':100,'Birth Date':new Date(24364800000)}];

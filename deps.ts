@@ -7,3 +7,4 @@ export * as stdIO from "https://deno.land/std@v0.61.0/io/mod.ts";
 export * as stdPath from "https://deno.land/std@v0.61.0/path/mod.ts";
 export * as stdAsserts from "https://deno.land/std@v0.61.0/testing/asserts.ts";
 export * as serializeJS from "https://denopkg.com/shah/javascript-stringify@v2.0.2/src/index.ts";
+export * as denoLibPrettier from "https://denolib.com/denolib/prettier/prettier.ts";

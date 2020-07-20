@@ -20,6 +20,7 @@ export const consolePolyglotErrorHandler = {
 };
 
 export interface PolyglotCodeArtifactsOptions {
+  readonly autoFormat?: boolean;
 }
 
 export interface PolyglotCodeArtifacts extends PolyglotCodeArtifactsOptions {

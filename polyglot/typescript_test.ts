@@ -5,13 +5,14 @@ import * as ts from "./typescript.ts";
 
 Deno.test("TypeScript Polyglot Persistence", async () => {
   const ph = new io.InMemoryPersistenceHandler();
-  const code = new ts.TypeScriptArtifacts(ph);
+  const code = new ts.TypeScriptArtifacts(ph, {});
   const module = new ts.TypeScriptModule(code, inflect.guessCaseValue("test"));
   code.declareModule(module);
 
   const intrf = new ts.TypeScriptInterface(
     module,
     inflect.guessCaseValue("Test Interface"),
+    {},
   );
   module.declareInterface(intrf);
   intrf.declareProperty(

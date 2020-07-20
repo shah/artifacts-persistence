@@ -4,6 +4,7 @@ import {
   inflect,
   valueMgr as vm,
   serializeJS,
+  denoLibPrettier as dlp,
 } from "../deps.ts";
 import { PersistenceHandler } from "../io.ts";
 import { TextArtifactNature } from "../nature.ts";
@@ -28,8 +29,13 @@ export class TypeScriptArtifact extends DefaultTextArtifact {
 
 export class TypeScriptArtifacts implements code.PolyglotCodeArtifacts {
   readonly modules: TypeScriptModule[] = [];
+  readonly autoFormat: boolean;
 
-  constructor(readonly ph: PersistenceHandler) {
+  constructor(
+    readonly ph: PersistenceHandler,
+    { autoFormat }: code.PolyglotCodeArtifactsOptions,
+  ) {
+    this.autoFormat = autoFormat !== undefined ? autoFormat : true;
   }
 
   declareModule(module: TypeScriptModule): void {
@@ -38,12 +44,24 @@ export class TypeScriptArtifacts implements code.PolyglotCodeArtifacts {
 
   emit(ctx: cm.Context, eh: code.PolyglotErrorHandler): void {
     for (const module of this.modules) {
-      const mta = new TypeScriptArtifact();
-      module.emit(ctx, mta, eh);
+      const unformattedMTA = new TypeScriptArtifact();
+      let formattedMTA = unformattedMTA;
+      module.emit(ctx, unformattedMTA, eh);
+      if (this.autoFormat) {
+        formattedMTA = new TypeScriptArtifact();
+        formattedMTA.appendText(
+          ctx,
+          dlp.prettier.format(unformattedMTA.textFragment(ctx), {
+            parser: "typescript",
+            plugins: dlp.prettierPlugins,
+          }),
+        );
+      }
+
       this.ph.persistTextArtifact(
         ctx,
         `${inflect.toKebabCase(module.name)}.ts`,
-        mta,
+        formattedMTA,
       );
     }
   }
@@ -73,14 +91,28 @@ export class TypeScriptModule implements code.PolyglotModuleDecl {
   }
 }
 
+export interface TypeScriptInterfaceOptions
+  extends code.PolyglotInterfaceDeclOptions {
+  readonly emitContentAsConst?: boolean;
+  readonly emitContentAsConstIdentifier?: inflect.InflectableValue;
+}
+
 export class TypeScriptInterface implements code.PolyglotInterfaceDecl {
   readonly properties: code.PolyglotPropertyDecl[] = [];
   readonly content: object[] = [];
+  readonly emitContentAsConst: boolean;
+  readonly emitContentAsConstIdentifier?: inflect.InflectableValue;
 
   constructor(
     readonly module: TypeScriptModule,
     readonly name: inflect.InflectableValue,
+    { emitContentAsConst, emitContentAsConstIdentifier }:
+      TypeScriptInterfaceOptions,
   ) {
+    this.emitContentAsConst = emitContentAsConst !== undefined
+      ? emitContentAsConst
+      : true;
+    this.emitContentAsConstIdentifier = emitContentAsConstIdentifier;
   }
 
   declareProperty(prop: code.PolyglotPropertyDecl): void {
@@ -108,27 +140,17 @@ export class TypeScriptInterface implements code.PolyglotInterfaceDecl {
     mta.appendText(ctx, "  " + propDecls.join("\n  "));
     mta.appendText(ctx, "\n}\n\n");
 
-    const contentConstIdentifier = inflect.toCamelCase(this.name) + "Content";
-    mta.appendText(
-      ctx,
-      `export const ${contentConstIdentifier}: ${intfIdentifier}[] = ${
-        serializeJS.stringify(this.content)
-      };`,
-    );
-    // for (const content of this.content) {
-    //   const contentDecls: string[] = [];
-    //   for (const property of this.properties) {
-    //     const decl = property.getContentDecl(ctx, content, eh);
-    //     if (decl) {
-    //       contentDecls.push(decl);
-    //     }
-    //   }
-    //   mta.appendText(
-    //     ctx,
-    //     "  {\n    " + contentDecls.join(",\n    ") + "\n  },\n",
-    //   );
-    // }
-    // mta.appendText(ctx, "];");
+    if (this.emitContentAsConst) {
+      const contentConstIdentifier = this.emitContentAsConstIdentifier ||
+        inflect.toCamelCase(this.name) + "Content";
+      const arraySuffix = Array.isArray(this.content) ? "[]" : "";
+      mta.appendText(
+        ctx,
+        `export const ${contentConstIdentifier}: ${intfIdentifier}${arraySuffix} = ${
+          serializeJS.stringify(this.content)
+        };`,
+      );
+    }
   }
 }
 

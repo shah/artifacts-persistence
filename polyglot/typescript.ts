@@ -6,7 +6,7 @@ import {
   serializeJS,
   denoLibPrettier as dlp,
 } from "../deps.ts";
-import { PersistenceHandler } from "../io.ts";
+import { PersistenceHandler, PersistArtifactOptions } from "../io.ts";
 import { TextArtifactNature } from "../nature.ts";
 import * as code from "../code.ts";
 
@@ -42,7 +42,11 @@ export class TypeScriptArtifacts implements code.PolyglotCodeArtifacts {
     this.modules.push(module);
   }
 
-  emit(ctx: cm.Context, eh: code.PolyglotErrorHandler): void {
+  emit(
+    ctx: cm.Context,
+    eh: code.PolyglotErrorHandler,
+    options?: PersistArtifactOptions,
+  ): void {
     for (const module of this.modules) {
       const unformattedMTA = new TypeScriptArtifact();
       let formattedMTA = unformattedMTA;
@@ -62,6 +66,7 @@ export class TypeScriptArtifacts implements code.PolyglotCodeArtifacts {
         ctx,
         `${inflect.toKebabCase(module.name)}.ts`,
         formattedMTA,
+        options,
       );
     }
   }

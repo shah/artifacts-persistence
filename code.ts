@@ -1,4 +1,5 @@
 import { contextMgr as cm, inflect } from "./deps.ts";
+import { PersistArtifactOptions } from "./io.ts";
 
 export type PolyglotErrorMessage = string;
 export type PolyglotIdentifier = string;
@@ -25,7 +26,11 @@ export interface PolyglotCodeArtifactsOptions {
 
 export interface PolyglotCodeArtifacts extends PolyglotCodeArtifactsOptions {
   declareModule(module: PolyglotModuleDecl): void;
-  emit(ctx: cm.Context, eh: PolyglotErrorHandler): void;
+  emit(
+    ctx: cm.Context,
+    eh: PolyglotErrorHandler,
+    options?: PersistArtifactOptions,
+  ): void;
 }
 
 export interface PolyglotModuleDeclOptions {

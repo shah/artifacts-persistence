@@ -74,7 +74,7 @@ export interface TextWriter {
 
 export interface PersistArtifactOptions {
   readonly appendIfExists?: boolean;
-  readonly appendDelim?: string;
+  readonly appendDelim?: vm.TextValue;
   readonly logicalNamingStrategy?: ArtifactNamingStrategy;
   readonly physicalNamingStrategy?: ArtifactNamingStrategy;
   readonly chmod?: number;
@@ -243,12 +243,12 @@ export class FileSystemPersistenceHandler implements PersistenceHandler {
           activePR.finalArtifactNamePhysicalAbs,
         );
         text = artifact.textFragment(ctx);
+        const appendDelim = ptaOptions.appendDelim
+          ? vm.resolveTextValue(ctx, ptaOptions.appendDelim)
+          : "";
         fs.writeFileStrSync(
           activePR.finalArtifactNamePhysicalAbs,
-          existingContent + (ptaOptions.appendDelim
-            ? ptaOptions.appendDelim
-            : "") +
-            text,
+          existingContent + appendDelim + text,
         );
         this.chmod(
           ctx,
@@ -332,6 +332,19 @@ export class InMemoryPersistenceHandler implements PersistenceHandler {
     return new DefaultTextArtifact(options);
   }
 
+  protected replaceResult(
+    key: string,
+    existing: PersistenceResult,
+    replaceWith: PersistenceResult,
+  ): PersistenceResult {
+    const foundIndex = this.results.findIndex((pr) => pr == existing);
+    this.resultsMap.set(key, replaceWith);
+    if (foundIndex >= 0) {
+      this.results[foundIndex] = replaceWith;
+    }
+    return replaceWith;
+  }
+
   public persistTextArtifact(
     ctx: cm.Context,
     artifactName: vm.TextValue,
@@ -359,13 +372,28 @@ export class InMemoryPersistenceHandler implements PersistenceHandler {
       this.results.push(pr);
       return pr;
     } else {
-      const pr = {
-        ...exists,
-        artifactText: exists.artifactText + artifact.textFragment(ctx),
-        artifacts: [...exists.artifacts, artifact],
-      };
-      this.resultsMap.set(finalLogical, pr);
-      return pr;
+      if (options?.appendIfExists) {
+        const appendDelim = options?.appendDelim
+          ? vm.resolveTextValue(ctx, options?.appendDelim)
+          : "";
+        return this.replaceResult(finalLogical, exists, {
+          ...exists,
+          artifactText: exists.artifactText + appendDelim +
+            artifact.textFragment(ctx),
+          artifacts: [...exists.artifacts, artifact],
+        });
+      } else {
+        return this.replaceResult(finalLogical, exists, {
+          origArtifactName: artifactName,
+          finalArtifactNameLogical: finalLogical,
+          finalArtifactNamePhysical: finalLogical,
+          finalArtifactNamePhysicalRel: finalLogical,
+          finalArtifactNamePhysicalAbs: finalLogical,
+          artifactText: artifact.text(ctx),
+          artifacts: [artifact],
+          overwroteExisting: [exists],
+        });
+      }
     }
   }
 

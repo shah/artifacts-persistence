@@ -38,8 +38,9 @@ export class TypeScriptArtifacts implements code.PolyglotCodeArtifacts {
     this.autoFormat = autoFormat !== undefined ? autoFormat : true;
   }
 
-  declareModule(module: TypeScriptModule): void {
+  declareModule(module: TypeScriptModule): code.PolyglotModuleDecl {
     this.modules.push(module);
+    return module;
   }
 
   emit(
@@ -73,7 +74,9 @@ export class TypeScriptArtifacts implements code.PolyglotCodeArtifacts {
 }
 
 export class TypeScriptModule implements code.PolyglotModuleDecl {
+  readonly isPolyglotModuleDecl = true;
   readonly interfaces: TypeScriptInterface[] = [];
+  readonly content: TypeScriptContent[] = [];
 
   constructor(
     readonly code: TypeScriptArtifacts,
@@ -81,8 +84,14 @@ export class TypeScriptModule implements code.PolyglotModuleDecl {
   ) {
   }
 
-  declareInterface(intf: TypeScriptInterface): void {
+  declareInterface(intf: TypeScriptInterface): code.PolyglotInterfaceDecl {
     this.interfaces.push(intf);
+    return intf;
+  }
+
+  declareContent(content: TypeScriptContent): code.PolyglotContentDecl {
+    this.content.push(content);
+    return content;
   }
 
   emit(
@@ -90,8 +99,29 @@ export class TypeScriptModule implements code.PolyglotModuleDecl {
     mta: MutableTextArtifact,
     eh: code.PolyglotErrorHandler,
   ): void {
+    let blockCount = 0;
     for (const intf of this.interfaces) {
+      if (blockCount > 0) {
+        mta.appendText(ctx, "\n\n");
+      }
       intf.emit(ctx, mta, eh);
+      blockCount++;
+    }
+
+    for (const c of this.content) {
+      if (blockCount > 0) {
+        mta.appendText(ctx, "\n\n");
+      }
+
+      const modifiers = c.mutable ? "let" : "const";
+      const identifer = inflect.toCamelCase(c.name);
+      mta.appendText(
+        ctx,
+        `export ${modifiers} ${identifer}: ${c.getTypeScriptTypeIdentifier()} = ${
+          serializeJS.stringify(c.content)
+        };`,
+      );
+      blockCount++;
     }
   }
 }
@@ -103,8 +133,8 @@ export interface TypeScriptInterfaceOptions
 }
 
 export class TypeScriptInterface implements code.PolyglotInterfaceDecl {
+  readonly isPolyglotInterfaceDecl: true = true;
   readonly properties: code.PolyglotPropertyDecl[] = [];
-  readonly content: object[] = [];
   readonly emitContentAsConst: boolean;
   readonly emitContentAsConstIdentifier?: inflect.InflectableValue;
 
@@ -120,12 +150,9 @@ export class TypeScriptInterface implements code.PolyglotInterfaceDecl {
     this.emitContentAsConstIdentifier = emitContentAsConstIdentifier;
   }
 
-  declareProperty(prop: code.PolyglotPropertyDecl): void {
+  declareProperty(prop: code.PolyglotPropertyDecl): code.PolyglotPropertyDecl {
     this.properties.push(prop);
-  }
-
-  declareContent(content: object): void {
-    this.content.push(content);
+    return prop;
   }
 
   emit(
@@ -143,26 +170,16 @@ export class TypeScriptInterface implements code.PolyglotInterfaceDecl {
     const intfIdentifier = inflect.toPascalCase(this.name);
     mta.appendText(ctx, `export interface ${intfIdentifier} {\n`);
     mta.appendText(ctx, "  " + propDecls.join("\n  "));
-    mta.appendText(ctx, "\n}\n\n");
-
-    if (this.emitContentAsConst) {
-      const contentConstIdentifier = this.emitContentAsConstIdentifier ||
-        inflect.toCamelCase(this.name) + "Content";
-      const arraySuffix = Array.isArray(this.content) ? "[]" : "";
-      mta.appendText(
-        ctx,
-        `export const ${contentConstIdentifier}: ${intfIdentifier}${arraySuffix} = ${
-          serializeJS.stringify(this.content)
-        };`,
-      );
-    }
+    mta.appendText(ctx, "\n}");
   }
 }
 
 export class TypicalTypeScriptProperty implements code.PolyglotPropertyDecl {
+  readonly isPolyglotPropertyDecl = true;
+
   constructor(
     readonly name: inflect.InflectableValue,
-    readonly tsType: vm.TextValue,
+    readonly tsType: TypeScriptInterface | vm.TextValue,
   ) {
   }
 
@@ -170,16 +187,43 @@ export class TypicalTypeScriptProperty implements code.PolyglotPropertyDecl {
     ctx: cm.Context,
     eh: code.PolyglotErrorHandler,
   ): string | undefined {
-    return `readonly ${inflect.toCamelCase(this.name)}: ${this.tsType};`;
+    return `readonly ${inflect.toCamelCase(this.name)}: ${
+      code.isPolyglotInterfaceDecl(this.tsType)
+        ? inflect.toPascalCase(this.tsType.name)
+        : vm.resolveTextValue(ctx, this.tsType)
+    };`;
+  }
+}
+
+export interface TypeScriptContentOptions extends code.PolyglotContentOptions {
+}
+
+export class TypeScriptContent
+  implements code.PolyglotContentDecl, TypeScriptContentOptions {
+  readonly isPolyglotContentDecl = true;
+  readonly mutable?: boolean;
+
+  constructor(
+    readonly name: inflect.InflectableValue,
+    readonly tsType: TypicalTypeScriptProperty | TypeScriptInterface,
+    readonly content: any,
+    { mutable }: TypeScriptContentOptions,
+  ) {
+    this.mutable = mutable;
   }
 
-  getContentDecl(
-    ctx: cm.Context,
-    content: object,
-    eh: code.PolyglotErrorHandler,
-  ): string | undefined {
-    const value = (content as any)[this.name.inflect()];
-    const identifier = inflect.toCamelCase(this.name);
-    return `${identifier}: ${serializeJS.stringify(value)}`;
+  getTypeScriptTypeIdentifier(): string {
+    if (code.isPolyglotInterfaceDecl(this.tsType)) {
+      const arraySuffix = this.content
+        ? (Array.isArray(this.content) ? "[]" : "")
+        : "";
+      return inflect.toPascalCase(this.tsType.name) + arraySuffix;
+    }
+
+    if (code.isPolyglotPropertyDecl(this.tsType)) {
+      return inflect.toPascalCase(this.tsType.name);
+    }
+
+    return `[TypeScriptContent] unknown tsType: ${this.tsType}`;
   }
 }

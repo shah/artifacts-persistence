@@ -239,14 +239,14 @@ export class FileSystemPersistenceHandler implements PersistenceHandler {
     let activePR = this.resultsMap.get(resultsMapKey);
     if (activePR && (ptaOptions && ptaOptions.appendIfExists)) {
       if (!this.fspOptions.dryRun) {
-        const existingContent = fs.readFileStrSync(
+        const existingContent = Deno.readTextFileSync(
           activePR.finalArtifactNamePhysicalAbs,
         );
         text = artifact.textFragment(ctx);
         const appendDelim = ptaOptions.appendDelim
           ? vm.resolveTextValue(ctx, ptaOptions.appendDelim)
           : "";
-        fs.writeFileStrSync(
+        Deno.writeTextFileSync(
           activePR.finalArtifactNamePhysicalAbs,
           existingContent + appendDelim + text,
         );
@@ -262,7 +262,7 @@ export class FileSystemPersistenceHandler implements PersistenceHandler {
     } else {
       const overwroteExisting = activePR ? true : false;
       if (!this.fspOptions.dryRun) {
-        fs.writeFileStrSync(finalPhysicalAbs, text);
+        Deno.writeTextFileSync(finalPhysicalAbs, text);
         this.chmod(
           ctx,
           finalPhysicalAbs,

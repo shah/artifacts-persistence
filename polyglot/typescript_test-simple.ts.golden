@@ -7,7 +7,7 @@ export interface TestInterface1 {
   readonly birthDate: Date;
 }
 
-export const testInterface1Content: TestInterface1[] = [
+const testInterface1Content: TestInterface1[] = [
   {
     "First Name": "Shahid",
     "Last Name": "Shah",
@@ -26,9 +26,7 @@ export interface TestInterface2 {
   readonly textProperty: string;
 }
 
-export const testInterface2Content: TestInterface2 = {
-  "Text Property": "Test"
-};
+const testInterface2Content: TestInterface2 = { "Text Property": "Test" };
 
 export interface TestInterface3 {
   readonly testInterface1Property: TestInterface1;
@@ -52,3 +50,5 @@ export const testInterface3Content: TestInterface3 = {
   ],
   testInterface2Property: { "Text Property": "Test" }
 };
+
+export default testInterface3Content;

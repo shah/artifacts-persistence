@@ -126,7 +126,7 @@ Deno.test("TypeScript Polyglot Persistence", async () => {
         testInterface1Property: intrf1Content,
         testInterface2Property: intrf2Content,
       },
-      {},
+      { moduleExport: true, moduleDefault: true },
     ),
   );
 

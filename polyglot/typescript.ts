@@ -113,14 +113,18 @@ export class TypeScriptModule implements code.PolyglotModuleDecl {
         mta.appendText(ctx, "\n\n");
       }
 
-      const modifiers = c.mutable ? "let" : "const";
+      const modifiers = (c.moduleExport ? "export " : "") +
+        (c.mutable ? "let" : "const");
       const identifer = inflect.toCamelCase(c.name);
       mta.appendText(
         ctx,
-        `export ${modifiers} ${identifer}: ${c.getTypeScriptTypeIdentifier()} = ${
+        `${modifiers} ${identifer}: ${c.getTypeScriptTypeIdentifier()} = ${
           serializeJS.stringify(c.content)
         };`,
       );
+      if (c.moduleDefault) {
+        mta.appendText(ctx, `\n\nexport default ${identifer};\n`);
+      }
       blockCount++;
     }
   }
@@ -196,20 +200,26 @@ export class TypicalTypeScriptProperty implements code.PolyglotPropertyDecl {
 }
 
 export interface TypeScriptContentOptions extends code.PolyglotContentOptions {
+  readonly moduleExport?: boolean;
+  readonly moduleDefault?: boolean;
 }
 
 export class TypeScriptContent
   implements code.PolyglotContentDecl, TypeScriptContentOptions {
   readonly isPolyglotContentDecl = true;
   readonly mutable?: boolean;
+  readonly moduleExport?: boolean;
+  readonly moduleDefault?: boolean;
 
   constructor(
     readonly name: inflect.InflectableValue,
     readonly tsType: TypicalTypeScriptProperty | TypeScriptInterface,
     readonly content: any,
-    { mutable }: TypeScriptContentOptions,
+    { mutable, moduleDefault, moduleExport }: TypeScriptContentOptions,
   ) {
     this.mutable = mutable;
+    this.moduleExport = moduleExport;
+    this.moduleDefault = moduleDefault;
   }
 
   getTypeScriptTypeIdentifier(): string {

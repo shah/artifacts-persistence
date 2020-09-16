@@ -1,4 +1,4 @@
-import { TextArtifactNature } from "../nature.ts";
+import type { TextArtifactNature } from "../nature.ts";
 
 export const jsonArtifact = new (class implements TextArtifactNature {
   readonly isTextArtifactNature = true;

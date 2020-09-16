@@ -1,6 +1,6 @@
 import { contextMgr as cm, stdIO, valueMgr as vm } from "./deps.ts";
-import { TextWriter, Writer } from "./io.ts";
-import { TextArtifactNature } from "./nature.ts";
+import type { TextWriter, Writer } from "./io.ts";
+import type { TextArtifactNature } from "./nature.ts";
 
 export interface Artifact {
   readonly isArtifact: true;

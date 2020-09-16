@@ -1,4 +1,4 @@
-import { valueMgr as vm } from "./deps.ts";
+import type { valueMgr as vm } from "./deps.ts";
 
 export interface TextArtifactNature {
   readonly isTextArtifactNature: true;

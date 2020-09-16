@@ -1,5 +1,5 @@
-import { contextMgr as cm, inflect } from "./deps.ts";
-import { PersistArtifactOptions } from "./io.ts";
+import type { contextMgr as cm, inflect } from "./deps.ts";
+import type { PersistArtifactOptions } from "./io.ts";
 
 export type PolyglotErrorMessage = string;
 export type PolyglotIdentifier = string;
@@ -34,6 +34,7 @@ export interface PolyglotCodeArtifacts extends PolyglotCodeArtifactsOptions {
 }
 
 export interface PolyglotModuleDeclOptions {
+  readonly isPolyglotModuleDecl?: true;
 }
 
 export interface PolyglotModuleDecl extends PolyglotModuleDeclOptions {
@@ -43,11 +44,12 @@ export interface PolyglotModuleDecl extends PolyglotModuleDeclOptions {
   declareContent(content: PolyglotContentDecl): PolyglotContentDecl;
 }
 
-export function isPolyglotModuleDecl(o: any): o is PolyglotModuleDecl {
-  return typeof o === "object" && "isPolyglotModuleDecl" in o;
+export function isPolyglotModuleDecl(o: unknown): o is PolyglotModuleDecl {
+  return o && typeof o === "object" && "isPolyglotModuleDecl" in o;
 }
 
 export interface PolyglotInterfaceDeclOptions {
+  readonly isPolyglotInterfaceDecl?: true;
 }
 
 export interface PolyglotInterfaceDecl extends PolyglotInterfaceDeclOptions {
@@ -56,11 +58,14 @@ export interface PolyglotInterfaceDecl extends PolyglotInterfaceDeclOptions {
   declareProperty(prop: PolyglotPropertyDecl): PolyglotPropertyDecl;
 }
 
-export function isPolyglotInterfaceDecl(o: any): o is PolyglotInterfaceDecl {
-  return typeof o === "object" && "isPolyglotInterfaceDecl" in o;
+export function isPolyglotInterfaceDecl(
+  o: unknown,
+): o is PolyglotInterfaceDecl {
+  return o && typeof o === "object" && "isPolyglotInterfaceDecl" in o;
 }
 
 export interface PolyglotPropertyDeclOptions {
+  readonly isPolyglotPropertyDecl?: true;
 }
 
 export interface PolyglotPropertyDecl extends PolyglotPropertyDeclOptions {
@@ -71,8 +76,8 @@ export interface PolyglotPropertyDecl extends PolyglotPropertyDeclOptions {
   ): string | undefined;
 }
 
-export function isPolyglotPropertyDecl(o: any): o is PolyglotPropertyDecl {
-  return typeof o === "object" && "isPolyglotPropertyDecl" in o;
+export function isPolyglotPropertyDecl(o: unknown): o is PolyglotPropertyDecl {
+  return o && typeof o === "object" && "isPolyglotPropertyDecl" in o;
 }
 
 export interface PolyglotContentOptions {
@@ -82,9 +87,9 @@ export interface PolyglotContentOptions {
 export interface PolyglotContentDecl extends PolyglotContentOptions {
   readonly isPolyglotContentDecl: true;
   readonly name: inflect.InflectableValue;
-  readonly content: any;
+  readonly content: unknown;
 }
 
-export function isPolyglotContentDecl(o: any): o is PolyglotContentDecl {
-  return typeof o === "object" && "isPolyglotContentDecl" in o;
+export function isPolyglotContentDecl(o: unknown): o is PolyglotContentDecl {
+  return o && typeof o === "object" && "isPolyglotContentDecl" in o;
 }

@@ -1,5 +1,5 @@
-import { valueMgr as vm } from "../deps.ts";
-import { TextArtifactNature } from "../nature.ts";
+import type { valueMgr as vm } from "../deps.ts";
+import type { TextArtifactNature } from "../nature.ts";
 
 export const sqlArtifact = new (class implements TextArtifactNature {
   readonly isTextArtifactNature = true;

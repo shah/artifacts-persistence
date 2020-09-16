@@ -6,8 +6,8 @@ import {
   serializeJS,
   denoLibPrettier as dlp,
 } from "../deps.ts";
-import { PersistenceHandler, PersistArtifactOptions } from "../io.ts";
-import { TextArtifactNature } from "../nature.ts";
+import type { PersistenceHandler, PersistArtifactOptions } from "../io.ts";
+import type { TextArtifactNature } from "../nature.ts";
 import * as code from "../code.ts";
 
 export const typeScriptArtifact = new (class implements TextArtifactNature {
@@ -214,7 +214,7 @@ export class TypeScriptContent
   constructor(
     readonly name: inflect.InflectableValue,
     readonly tsType: TypicalTypeScriptProperty | TypeScriptInterface,
-    readonly content: any,
+    readonly content: unknown,
     { mutable, moduleDefault, moduleExport }: TypeScriptContentOptions,
   ) {
     this.mutable = mutable;

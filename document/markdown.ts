@@ -3,11 +3,11 @@ import {
   stdEncodeYAML as yaml,
   stdIO,
 } from "../deps.ts";
-import { TextWriter, Writer } from "../io.ts";
-import { TextArtifactNature } from "../nature.ts";
+import type { TextWriter, Writer } from "../io.ts";
+import type { TextArtifactNature } from "../nature.ts";
 
 export interface Frontmatter {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export const markdownArtifact = new (class implements TextArtifactNature {
@@ -18,9 +18,6 @@ export const markdownArtifact = new (class implements TextArtifactNature {
 
   constructor() {}
 })();
-
-export interface MarkdownArtifactOptions {
-}
 
 export class MarkdownArtifact {
   readonly isArtifact = true;

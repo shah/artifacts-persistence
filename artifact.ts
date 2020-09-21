@@ -13,8 +13,8 @@ export interface TextArtifact extends Artifact {
   textFragment(ctx: cm.Context): string;
 }
 
-export function isTextArtifact(o: any): o is TextArtifact {
-  return "isTextArtifact" in o;
+export function isTextArtifact(o: unknown): o is TextArtifact {
+  return o && typeof o === "object" && "isTextArtifact" in o;
 }
 
 export interface MutableTextArtifact extends TextArtifact {
@@ -23,8 +23,8 @@ export interface MutableTextArtifact extends TextArtifact {
   appendText(ctx: cm.Context, content: string | TextWriter): void;
 }
 
-export function isMutableTextArtifact(o: any): o is MutableTextArtifact {
-  return "isMutableTextArtifact" in o;
+export function isMutableTextArtifact(o: unknown): o is MutableTextArtifact {
+  return o && typeof o === "object" && "isMutableTextArtifact" in o;
 }
 
 export interface MutableTextArtifactOptions {

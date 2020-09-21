@@ -91,9 +91,9 @@ export interface PersistenceDestinationSupplier {
 }
 
 export function isPersistenceDestinationSupplier(
-  o: object,
+  o: unknown,
 ): o is PersistenceDestinationSupplier {
-  return "isPersistenceDestinationSupplier" in o;
+  return o && typeof o === "object" && "isPersistenceDestinationSupplier" in o;
 }
 
 export interface PersistenceHandler {

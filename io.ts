@@ -10,10 +10,7 @@ import {
   stdPath as path,
   valueMgr as vm,
 } from "./deps.ts";
-import {
-  ArtifactNamingStrategy,
-  asIsNamingStrategy,
-} from "./naming.ts";
+import { ArtifactNamingStrategy, asIsNamingStrategy } from "./naming.ts";
 
 export type Reader = Deno.Reader;
 export type Writer = Deno.Writer;

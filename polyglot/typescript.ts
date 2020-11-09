@@ -1,12 +1,12 @@
-import { MutableTextArtifact, DefaultTextArtifact } from "../artifact.ts";
+import { DefaultTextArtifact, MutableTextArtifact } from "../artifact.ts";
 import {
   contextMgr as cm,
-  inflect,
-  valueMgr as vm,
-  serializeJS,
   denoLibPrettier as dlp,
+  inflect,
+  serializeJS,
+  valueMgr as vm,
 } from "../deps.ts";
-import type { PersistenceHandler, PersistArtifactOptions } from "../io.ts";
+import type { PersistArtifactOptions, PersistenceHandler } from "../io.ts";
 import type { TextArtifactNature } from "../nature.ts";
 import * as code from "../code.ts";
 

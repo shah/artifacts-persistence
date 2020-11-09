@@ -1,8 +1,4 @@
-import {
-  contextMgr as cm,
-  stdEncodeYAML as yaml,
-  stdIO,
-} from "../deps.ts";
+import { contextMgr as cm, stdEncodeYAML as yaml, stdIO } from "../deps.ts";
 import type { TextWriter, Writer } from "../io.ts";
 import type { TextArtifactNature } from "../nature.ts";
 

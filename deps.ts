@@ -1,10 +1,10 @@
 export * as contextMgr from "https://denopkg.com/shah/context-manager@v1.0.6/mod.ts";
 export * as inflect from "https://denopkg.com/shah/text-inflect@v1.0.4/mod.ts";
 export * as valueMgr from "https://denopkg.com/shah/value-manager@v1.0.8/mod.ts";
-export * as stdEncodeYAML from "https://deno.land/std@v0.70.0/encoding/yaml.ts";
-export * as stdFS from "https://deno.land/std@v0.70.0/fs/mod.ts";
-export * as stdIO from "https://deno.land/std@v0.70.0/io/mod.ts";
-export * as stdPath from "https://deno.land/std@v0.70.0/path/mod.ts";
-export * as stdAsserts from "https://deno.land/std@v0.70.0/testing/asserts.ts";
+export * as stdEncodeYAML from "https://deno.land/std@0.77.0/encoding/yaml.ts";
+export * as stdFS from "https://deno.land/std@0.77.0/fs/mod.ts";
+export * as stdIO from "https://deno.land/std@0.77.0/io/mod.ts";
+export * as stdPath from "https://deno.land/std@0.77.0/path/mod.ts";
+export * as stdAsserts from "https://deno.land/std@0.77.0/testing/asserts.ts";
 export * as serializeJS from "https://denopkg.com/shah/javascript-stringify@v2.0.4/src/index.ts";
 export * as denoLibPrettier from "https://denolib.com/denolib/prettier/prettier.ts";

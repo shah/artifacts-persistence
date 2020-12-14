@@ -1,4 +1,4 @@
-import { contextMgr as cm, stdIO, valueMgr as vm } from "./deps.ts";
+import { contextMgr as cm, safety, stdIO, valueMgr as vm } from "./deps.ts";
 import type { TextWriter, Writer } from "./io.ts";
 import type { TextArtifactNature } from "./nature.ts";
 
@@ -13,9 +13,9 @@ export interface TextArtifact extends Artifact {
   textFragment(ctx: cm.Context): string;
 }
 
-export function isTextArtifact(o: unknown): o is TextArtifact {
-  return o && typeof o === "object" && "isTextArtifact" in o;
-}
+export const isTextArtifact = safety.typeGuard<TextArtifact>(
+  "isTextArtifact",
+);
 
 export interface MutableTextArtifact extends TextArtifact {
   readonly isMutableTextArtifact: true;
@@ -23,9 +23,9 @@ export interface MutableTextArtifact extends TextArtifact {
   appendText(ctx: cm.Context, content: string | TextWriter): void;
 }
 
-export function isMutableTextArtifact(o: unknown): o is MutableTextArtifact {
-  return o && typeof o === "object" && "isMutableTextArtifact" in o;
-}
+export const isMutableTextArtifact = safety.typeGuard<MutableTextArtifact>(
+  "isMutableTextArtifact",
+);
 
 export interface MutableTextArtifactOptions {
   readonly nature: TextArtifactNature;

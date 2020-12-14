@@ -1,4 +1,5 @@
 import type { contextMgr as cm, inflect } from "./deps.ts";
+import { safety } from "./deps.ts";
 import type { PersistArtifactOptions } from "./io.ts";
 
 export type PolyglotErrorMessage = string;
@@ -44,9 +45,9 @@ export interface PolyglotModuleDecl extends PolyglotModuleDeclOptions {
   declareContent(content: PolyglotContentDecl): PolyglotContentDecl;
 }
 
-export function isPolyglotModuleDecl(o: unknown): o is PolyglotModuleDecl {
-  return o && typeof o === "object" && "isPolyglotModuleDecl" in o;
-}
+export const isPolyglotModuleDecl = safety.typeGuard<PolyglotModuleDecl>(
+  "isPolyglotModuleDecl",
+);
 
 export interface PolyglotInterfaceDeclOptions {
   readonly isPolyglotInterfaceDecl?: true;
@@ -58,11 +59,9 @@ export interface PolyglotInterfaceDecl extends PolyglotInterfaceDeclOptions {
   declareProperty(prop: PolyglotPropertyDecl): PolyglotPropertyDecl;
 }
 
-export function isPolyglotInterfaceDecl(
-  o: unknown,
-): o is PolyglotInterfaceDecl {
-  return o && typeof o === "object" && "isPolyglotInterfaceDecl" in o;
-}
+export const isPolyglotInterfaceDecl = safety.typeGuard<PolyglotInterfaceDecl>(
+  "isPolyglotInterfaceDecl",
+);
 
 export interface PolyglotPropertyDeclOptions {
   readonly isPolyglotPropertyDecl?: true;
@@ -76,9 +75,9 @@ export interface PolyglotPropertyDecl extends PolyglotPropertyDeclOptions {
   ): string | undefined;
 }
 
-export function isPolyglotPropertyDecl(o: unknown): o is PolyglotPropertyDecl {
-  return o && typeof o === "object" && "isPolyglotPropertyDecl" in o;
-}
+export const isPolyglotPropertyDecl = safety.typeGuard<PolyglotPropertyDecl>(
+  "isPolyglotPropertyDecl",
+);
 
 export interface PolyglotContentOptions {
   readonly mutable?: boolean;
@@ -90,6 +89,6 @@ export interface PolyglotContentDecl extends PolyglotContentOptions {
   readonly content: unknown;
 }
 
-export function isPolyglotContentDecl(o: unknown): o is PolyglotContentDecl {
-  return o && typeof o === "object" && "isPolyglotContentDecl" in o;
-}
+export const isPolyglotContentDecl = safety.typeGuard<PolyglotContentDecl>(
+  "isPolyglotContentDecl",
+);

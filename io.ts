@@ -6,6 +6,7 @@ import {
 } from "./artifact.ts";
 import {
   contextMgr as cm,
+  safety,
   stdFS as fs,
   stdPath as path,
   valueMgr as vm,
@@ -87,11 +88,11 @@ export interface PersistenceDestinationSupplier {
   readonly persistDestAs: PersistenceDestAs;
 }
 
-export function isPersistenceDestinationSupplier(
-  o: unknown,
-): o is PersistenceDestinationSupplier {
-  return o && typeof o === "object" && "isPersistenceDestinationSupplier" in o;
-}
+export const isPersistenceDestinationSupplier = safety.typeGuard<
+  PersistenceDestinationSupplier
+>(
+  "isPersistenceDestinationSupplier",
+);
 
 export interface PersistenceHandler {
   readonly results: PersistenceResult[];

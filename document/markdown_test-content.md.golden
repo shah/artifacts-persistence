@@ -1,0 +1,29 @@
+---
+title: Generated Markdown
+---
+
+# This is a heading.
+## This is a heading.
+### This is a heading.
+#### This is a heading.
+##### This is a heading.
+###### This is a heading.
+This is regular text.
+***Italic text.***
+**Bold text.**
+~~Strike through text.~~
+More regular text.
+Text and `inline code` :-)
+and then some more text.
+  
+1. Apples
+2. Oranges
+3. Bananas
+  
+* Apples
+* Oranges
+* Bananas
+[example](https://github.com/skulptur/markdown-fns/tree/master/example)
+<b>HTML without params</b>
+<tag param>HTML tag with simple param</tag>
+<span style="abc:xyz">span HTML with key/value param</span>

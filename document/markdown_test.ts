@@ -1,22 +1,18 @@
-import { contextMgr as cm, inflect, stdAsserts as ta } from "../deps.ts";
+import { contextMgr as cm, inflect } from "../deps.ts";
+import { path, testingAsserts as ta } from "../deps-test.ts";
 import * as io from "../io.ts";
-import * as md from "./markdown.ts";
-import {
-  bold,
-  frontMatterYAML,
-  heading,
-  htmlTag,
-  htmlTagFn,
-  inlineCode,
-  italic,
-  lines,
-  link,
-  ordered,
-  spaces,
-  strike,
-  times,
-  unordered,
-} from "./markdown.ts";
+import * as mod from "./mod.ts";
+import { markdownTags as md } from "./mod.ts";
+
+function testFilePath(relTestFileName: string): string {
+  return path.join(
+    path.relative(
+      Deno.cwd(),
+      path.dirname(import.meta.url).substr("file://".length),
+    ),
+    relTestFileName,
+  );
+}
 
 Deno.test("Markdown Document Persistence", () => {
   const ph = new io.InMemoryPersistenceHandler();
@@ -27,7 +23,7 @@ Deno.test("Markdown Document Persistence", () => {
       environmentsName: inflect.guessCaseValue("*_test.ts"),
     },
   };
-  const mda = new md.MarkdownArtifact();
+  const mda = new mod.MarkdownArtifact();
   mda.frontmatter.property1 = "string";
   mda.frontmatter["Property 2"] = 100;
   mda.frontmatter.date = new Date("2020-10-10");
@@ -36,71 +32,44 @@ Deno.test("Markdown Document Persistence", () => {
 
   ta.assertEquals(ph.results.length, 1, "Expected a single result");
 
-  const golden = io.readFileAsTextFromPaths(
-    "markdown_test-simple.md.golden",
-    [".", "document"], // might be run from module root or current folder
+  const golden = Deno.readTextFileSync(
+    testFilePath("markdown_test-front-matter.md.golden"),
   );
   ta.assertEquals(ph.results[0].artifactText, golden);
 });
-
-const generatedMD = `---
-title: Generated Markdown
----
-
-# This is a heading.
-## This is a heading.
-### This is a heading.
-#### This is a heading.
-##### This is a heading.
-###### This is a heading.
-This is regular text.
-***Italic text.***
-**Bold text.**
-~~Strike through text.~~
-More regular text.
-Text and \`inline code\` :-)
-and then some more text.
-  
-1. Apples
-2. Oranges
-3. Bananas
-  
-* Apples
-* Oranges
-* Bananas
-[example](https://github.com/skulptur/markdown-fns/tree/master/example)
-<b>HTML without params</b>
-<tag param>HTML tag with simple param</tag>
-<span style="abc:xyz">span HTML with key/value param</span>
-{{<todo assign="shah">}}an assignment{{</todo>}}`;
 
 Deno.test(`simple Markdown content generator`, () => {
   const exampleUrl =
     "https://github.com/skulptur/markdown-fns/tree/master/example";
   const fruits = ["Apples", "Oranges", "Bananas"];
 
-  const span = htmlTagFn("span");
-  const customTag = htmlTagFn("tag");
+  const span = md.htmlTagFn("span");
+  const customTag = md.htmlTagFn("tag");
 
-  const markdown = lines([
-    frontMatterYAML({ title: "Generated Markdown" }),
-    lines(times((index) => heading(index + 1, "This is a heading."), 6)),
+  const markdown = md.lines([
+    md.frontMatterYAML({ title: "Generated Markdown" }),
+    md.lines(
+      md.times((index) => md.heading(index + 1, "This is a heading."), 6),
+    ),
     "This is regular text.",
-    italic("Italic text."),
-    bold("Bold text."),
-    strike("Strike through text."),
-    lines([
+    md.italic("Italic text."),
+    md.bold("Bold text."),
+    md.strike("Strike through text."),
+    md.lines([
       "More regular text.",
-      spaces("Text and", inlineCode("inline code"), ":-)"),
+      md.spaces("Text and", md.inlineCode("inline code"), ":-)"),
       "and then some more text.",
     ]),
-    ordered(fruits),
-    unordered(fruits),
-    link("example", exampleUrl),
-    htmlTag("b", "HTML without params"),
+    md.ordered(fruits),
+    md.unordered(fruits),
+    md.link("example", exampleUrl),
+    md.htmlTag("b", "HTML without params"),
     customTag("param", "HTML tag with simple param"),
     span({ style: "abc:xyz" }, "span HTML with key/value param"),
   ]);
 
-  ta.assertEquals(markdown, generatedMD);
+  const golden = Deno.readTextFileSync(
+    testFilePath("markdown_test-content.md.golden"),
+  );
+  ta.assertEquals(markdown, golden);
 });

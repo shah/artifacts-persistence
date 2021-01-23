@@ -1,9 +1,10 @@
 import * as c from "../code.ts";
-import { inflect, stdAsserts as a } from "../deps.ts";
+import { inflect } from "../deps.ts";
+import { testingAsserts as ta } from "../deps-test.ts";
 import * as io from "../io.ts";
 import * as ts from "./typescript.ts";
 
-Deno.test("TypeScript Polyglot Persistence", async () => {
+Deno.test("TypeScript Polyglot Persistence", () => {
   const ph = new io.InMemoryPersistenceHandler();
   const code = new ts.TypeScriptArtifacts(ph, {});
   const module1 = new ts.TypeScriptModule(
@@ -141,11 +142,11 @@ Deno.test("TypeScript Polyglot Persistence", async () => {
     c.consolePolyglotErrorHandler,
     { appendIfExists: true, appendDelim: "\n" },
   );
-  a.assertEquals(ph.results.length, 1, "Expected a single result");
+  ta.assertEquals(ph.results.length, 1, "Expected a single result");
 
   const golden = io.readFileAsTextFromPaths(
     "typescript_test-simple.ts.golden",
     [".", "polyglot"], // might be run from module root or current folder
   );
-  a.assertEquals(ph.results[0].artifactText, golden);
+  ta.assertEquals(ph.results[0].artifactText, golden);
 });

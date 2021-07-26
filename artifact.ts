@@ -57,7 +57,7 @@ export class DefaultTextArtifact implements MutableTextArtifact {
   }
 
   text(ctx: cm.Context): string {
-    const sw = this.writer as stdIO.StringWriter;
+    const _sw = this.writer as stdIO.StringWriter;
     const preamble = this.options.preamble
       ? vm.resolveTextValue(ctx, this.options.preamble)
       : this.nature.defaultPreamble
@@ -67,7 +67,7 @@ export class DefaultTextArtifact implements MutableTextArtifact {
     return preamble ? preamble + this.writer.toString() : text;
   }
 
-  textFragment(ctx: cm.Context): string {
+  textFragment(_ctx: cm.Context): string {
     return this.writer.toString();
   }
 }

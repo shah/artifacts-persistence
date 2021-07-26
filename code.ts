@@ -14,7 +14,7 @@ export interface PolyglotErrorHandler {
 
 export const consolePolyglotErrorHandler = {
   reportError(
-    code: PolyglotCodeArtifacts,
+    _code: PolyglotCodeArtifacts,
     message: PolyglotErrorMessage,
   ): void {
     console.error(message);

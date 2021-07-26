@@ -70,7 +70,7 @@ export interface SequenceNumberFormatter {
 }
 
 export function asIsSequenceNumberSupplier(
-  ctx: cm.Context,
+  _ctx: cm.Context,
   params: ArtifactNamingParams,
 ): number {
   return params.fileIndex;
@@ -80,7 +80,7 @@ export function startAtSequenceNumberSupplier(
   startIndex: number,
 ): SequenceNumberSupplier {
   return (
-    ctx: cm.Context,
+    _ctx: cm.Context,
     params: ArtifactNamingParams,
   ): number => {
     return startIndex + params.fileIndex;
@@ -123,8 +123,8 @@ export function appendExtnNamingStrategy(
 ): ArtifactNamingStrategy {
   if (fileNameIsJustAnExtension(destFile)) {
     return (
-      ctx: cm.Context,
-      params: ArtifactNamingParams,
+      _ctx: cm.Context,
+      _params: ArtifactNamingParams,
     ): string => {
       return path.basename(sourceFile) + destFile;
     };

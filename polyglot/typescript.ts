@@ -189,7 +189,7 @@ export class TypicalTypeScriptProperty implements code.PolyglotPropertyDecl {
 
   getInterfaceDecl(
     ctx: cm.Context,
-    eh: code.PolyglotErrorHandler,
+    _eh: code.PolyglotErrorHandler,
   ): string | undefined {
     return `readonly ${inflect.toCamelCase(this.name)}: ${
       code.isPolyglotInterfaceDecl(this.tsType)

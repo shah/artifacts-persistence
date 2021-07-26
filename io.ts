@@ -36,8 +36,8 @@ export interface PeristenceReporter {
 }
 
 export function consolePersistenceResultReporter(
-  ctx: cm.Context,
-  ph: PersistenceHandler,
+  _ctx: cm.Context,
+  _ph: PersistenceHandler,
   result: PersistenceResult | string,
 ): void {
   console.log(
@@ -173,7 +173,7 @@ export class FileSystemPersistenceHandler implements PersistenceHandler {
   }
 
   createMutableTextArtifact(
-    ctx: cm.Context,
+    _ctx: cm.Context,
     options: MutableTextArtifactOptions,
   ): MutableTextArtifact {
     return new DefaultTextArtifact(options);
@@ -258,7 +258,6 @@ export class FileSystemPersistenceHandler implements PersistenceHandler {
       }
       activePR.artifacts.push(artifact);
     } else {
-      const overwroteExisting = activePR ? true : false;
       if (!this.fspOptions.dryRun) {
         Deno.writeTextFileSync(finalPhysicalAbs, text);
         this.chmod(
@@ -324,7 +323,7 @@ export class InMemoryPersistenceHandler implements PersistenceHandler {
   ) {}
 
   createMutableTextArtifact(
-    ctx: cm.Context,
+    _ctx: cm.Context,
     options: MutableTextArtifactOptions,
   ): MutableTextArtifact {
     return new DefaultTextArtifact(options);
@@ -396,9 +395,9 @@ export class InMemoryPersistenceHandler implements PersistenceHandler {
   }
 
   handleError(
-    ctx: cm.Context,
+    _ctx: cm.Context,
     artifactName: vm.TextValue,
-    artifact: TextArtifact,
+    _artifact: TextArtifact,
     code: number,
     message: string,
   ): void {
@@ -413,7 +412,7 @@ export class ConsolePersistenceHandler implements PersistenceHandler {
   constructor() {}
 
   createMutableTextArtifact(
-    ctx: cm.Context,
+    _ctx: cm.Context,
     options: MutableTextArtifactOptions,
   ): MutableTextArtifact {
     return new DefaultTextArtifact(options);
@@ -423,7 +422,7 @@ export class ConsolePersistenceHandler implements PersistenceHandler {
     ctx: cm.Context,
     artifactName: vm.TextValue,
     artifact: TextArtifact,
-    options?: PersistArtifactOptions,
+    _options?: PersistArtifactOptions,
   ): PersistenceResult {
     console.log(artifact.text(ctx));
     const finalLogical = vm.resolveTextValue(ctx, artifactName);
@@ -454,9 +453,9 @@ export class ConsolePersistenceHandler implements PersistenceHandler {
   }
 
   handleError(
-    ctx: cm.Context,
+    _ctx: cm.Context,
     artifactName: vm.TextValue,
-    artifact: TextArtifact,
+    _artifact: TextArtifact,
     code: number,
     message: string,
   ): void {
@@ -474,7 +473,7 @@ export function readFileAsTextFromPaths(
   for (const ptc of pathsToCheck) {
     try {
       return decoder.decode(Deno.readFileSync(path.join(ptc, fileName)));
-    } catch (e) {
+    } catch (_) {
       // the file wasn't found, eat the error for now because we'll
       // try multiple directories
     }

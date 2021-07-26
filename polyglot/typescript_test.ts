@@ -107,13 +107,13 @@ Deno.test("TypeScript Polyglot Persistence", () => {
     {},
   );
   module3.declareInterface(intrf3);
-  const testIntrf1Prop = intrf3.declareProperty(
+  const _testIntrf1Prop = intrf3.declareProperty(
     new ts.TypicalTypeScriptProperty(
       inflect.guessCaseValue("Test Interface 1 Property"),
       intrf1,
     ),
   );
-  const testIntrf2Prop = intrf3.declareProperty(
+  const _testIntrf2Prop = intrf3.declareProperty(
     new ts.TypicalTypeScriptProperty(
       inflect.guessCaseValue("Test Interface 2 Property"),
       intrf2,

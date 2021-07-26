@@ -1,9 +1,4 @@
-import {
-  contextMgr as cm,
-  stdEncodeTOML as toml,
-  stdEncodeYAML as yaml,
-  stdIO,
-} from "../deps.ts";
+import { contextMgr as cm, stdEncodeYAML as yaml, stdIO } from "../deps.ts";
 import type { TextWriter, Writer } from "../io.ts";
 import type { TextArtifactNature } from "../nature.ts";
 
@@ -45,8 +40,8 @@ export class MarkdownArtifact {
     }
   }
 
-  text(ctx: cm.Context): string {
-    const sw = this.writer as stdIO.StringWriter;
+  text(_ctx: cm.Context): string {
+    const _sw = this.writer as stdIO.StringWriter;
     const frontmatter = Object.keys(this.frontmatter).length > 0
       ? yaml.stringify(this.frontmatter)
       : undefined;
@@ -54,7 +49,7 @@ export class MarkdownArtifact {
     return frontmatter ? ("---\n" + frontmatter + "---\n" + text) : text;
   }
 
-  textFragment(ctx: cm.Context): string {
+  textFragment(_ctx: cm.Context): string {
     return this.writer.toString();
   }
 }

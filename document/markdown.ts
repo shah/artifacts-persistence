@@ -41,7 +41,6 @@ export class MarkdownArtifact {
   }
 
   text(_ctx: cm.Context): string {
-    const _sw = this.writer as stdIO.StringWriter;
     const frontmatter = Object.keys(this.frontmatter).length > 0
       ? yaml.stringify(this.frontmatter)
       : undefined;
